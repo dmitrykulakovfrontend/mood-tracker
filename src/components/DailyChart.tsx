@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   Area,
   AreaChart,
@@ -9,20 +10,32 @@ import {
 } from "recharts";
 import { type Data } from "~/pages";
 
+type DailyAverage = {
+  time: string;
+  mood?: number;
+  stressors?: number;
+  weather?: number;
+  energy?: number;
+};
+
 const DailyChart = (props: { data: Data | null }) => {
-  function getAverageSymptoms(data: Data) {
+  function getAverageSymptoms(data: Data | null) {
+    if (!data) return;
     const result = [];
 
     for (const [date, values] of Object.entries(data)) {
-      const average: { [key: string]: number } = {
+      const average: DailyAverage = {
         time: date,
       };
 
       for (const symptoms of Object.values(values)) {
         for (const [key, value] of Object.entries(symptoms)) {
+          // @ts-ignore
           if (!average[key]) {
+            // @ts-ignore
             average[key] = value;
           } else {
+            // @ts-ignore
             average[key] += value;
           }
         }
@@ -30,6 +43,7 @@ const DailyChart = (props: { data: Data | null }) => {
 
       for (const key of Object.keys(average)) {
         if (key !== "time") {
+          // @ts-ignore
           average[key] /= Object.keys(values).length;
         }
       }
@@ -40,7 +54,6 @@ const DailyChart = (props: { data: Data | null }) => {
     return result;
   }
 
-  if (!props.data) return "";
   return (
     <>
       <AreaChart

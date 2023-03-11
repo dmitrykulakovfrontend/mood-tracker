@@ -1,9 +1,10 @@
 import { type NextPage } from "next";
 import dynamic from "next/dynamic";
 import { type ChangeEvent, useState, type FormEvent, useEffect } from "react";
-import DailyChart from "~/components/DailyChart";
+// import DailyChart from "~/components/DailyChart";
 
-const AreaChart = dynamic(import("../components/AreaChart"), { ssr: false });
+const AreaChart = dynamic(import("~/components/AreaChart"), { ssr: false });
+const DailyChart = dynamic(import("~/components/DailyChart"), { ssr: false });
 export type TimeLog = {
   mood: number;
   stressors: number;
