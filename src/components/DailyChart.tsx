@@ -44,7 +44,7 @@ const DailyChart = (props: { data: Data | null }) => {
       for (const key of Object.keys(average)) {
         if (key !== "time") {
           // @ts-ignore
-          average[key] /= Object.keys(values).length;
+          average[key] = (average[key] / Object.keys(values).length).toFixed(2);
         }
       }
 
