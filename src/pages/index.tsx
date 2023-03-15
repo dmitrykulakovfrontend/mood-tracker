@@ -68,7 +68,7 @@ const Home: NextPage = () => {
   }, []);
   useEffect(() => {
     const timer = setInterval(() => {
-      const times = ["10:00", "13:00", "16:00", "19:00", "22:00", "20:27"];
+      const times = ["10:00", "13:00", "16:00", "19:00", "22:00"];
       const currentHour = new Date().getHours();
       const currentMinute = new Date().getMinutes();
       const currentTime = `${currentHour}:${currentMinute}`;
