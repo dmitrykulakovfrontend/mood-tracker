@@ -2,6 +2,9 @@ import { type NextPage } from "next";
 import dynamic from "next/dynamic";
 import { type ChangeEvent, useState, type FormEvent, useEffect } from "react";
 // import DailyChart from "~/components/DailyChart";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import sound from "../reminder.mp3";
 
 const AreaChart = dynamic(import("~/components/AreaChart"), { ssr: false });
 const DailyChart = dynamic(import("~/components/DailyChart"), { ssr: false });
@@ -22,9 +25,8 @@ export type Data = {
 };
 
 const Home: NextPage = () => {
-  function showNotification() {
-    new Notification("Hello World");
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps, @typescript-eslint/no-unsafe-argument
+  const audio = typeof Audio !== "undefined" ? new Audio(sound) : undefined;
 
   const [form, setForm] = useState<{
     time: string;
@@ -64,13 +66,14 @@ const Home: NextPage = () => {
       const currentMinute = new Date().getMinutes();
       const currentTime = `${currentHour}:${currentMinute}`;
       if (times.includes(currentTime)) {
+        audio?.play().catch((e) => console.error(e));
         new Notification("Time to write about your mood!", {
           body: "If you don't want to, you can always change it later :)",
         });
       }
     }, 60000);
     return () => clearInterval(timer);
-  }, []);
+  }, [audio]);
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     setForm({ ...form, [name]: type === "number" ? +value : value });
