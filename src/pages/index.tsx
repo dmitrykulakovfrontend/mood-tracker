@@ -21,13 +21,15 @@ export type TimeLog = {
   energy: number;
 };
 export type Data = {
-  [date: string]: {
-    "10:00": TimeLog;
-    "13:00": TimeLog;
-    "16:00": TimeLog;
-    "19:00": TimeLog;
-    "22:00": TimeLog;
-  };
+  [date: string]: Day;
+};
+
+export type Day = {
+  "10:00": TimeLog;
+  "13:00": TimeLog;
+  "16:00": TimeLog;
+  "19:00": TimeLog;
+  "22:00": TimeLog;
 };
 
 const Home: NextPage = () => {

@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { useState } from "react";
 import {
   Area,
   AreaChart,
   CartesianGrid,
+  Label,
   Legend,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import { type Data } from "~/pages";
+import { type CategoricalChartState } from "recharts/types/chart/generateCategoricalChart";
+import { date } from "zod";
+import { type Day, type Data } from "~/pages";
 
 type DailyAverage = {
   time: string;
@@ -18,7 +22,7 @@ type DailyAverage = {
   energy?: number;
 };
 
-const DailyChart = (props: { data: Data | null }) => {
+const DailyChart = ({ data }: { data: Data | null }) => {
   function getAverageSymptoms(data: Data | null) {
     if (!data) return;
     const result = [];
@@ -53,19 +57,57 @@ const DailyChart = (props: { data: Data | null }) => {
 
     return result;
   }
-
+  function formatDay(day: Day) {
+    const result = [];
+    for (const [key, value] of Object.entries(day)) {
+      result.push({
+        time: key,
+        ...value,
+      });
+    }
+    return result;
+  }
+  function handleClick(e: CategoricalChartState) {
+    const date = e.activeLabel;
+    if (!date || !data) return;
+    const day = data[date];
+    if (!day) return;
+    const formattedDay = formatDay(day);
+    setDayView(true);
+    setDay(formattedDay);
+  }
+  const [day, setDay] = useState<
+    | {
+        mood: number;
+        stressors: number;
+        weather: number;
+        energy: number;
+        time: string;
+      }[]
+  >([]);
+  const [isDayView, setDayView] = useState(false);
   return (
-    <>
+    <div className="relative">
+      {isDayView && (
+        <button
+          className="absolute top-4 left-20 z-10 bg-green-400 py-1 px-2"
+          onClick={(e) => setDayView(false)}
+        >
+          Back
+        </button>
+      )}
       <AreaChart
         width={730}
         height={250}
-        data={getAverageSymptoms(props.data)}
+        data={isDayView ? day : getAverageSymptoms(data)}
         margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+        onClick={handleClick}
       >
         <XAxis dataKey="time" />
         <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
         <Tooltip />
+        {isDayView && <Label />}
         <Legend
           align="right"
           layout="vertical"
@@ -101,7 +143,7 @@ const DailyChart = (props: { data: Data | null }) => {
           fill="url(#colorPv)"
         />
       </AreaChart>
-    </>
+    </div>
   );
 };
 
