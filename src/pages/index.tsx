@@ -29,12 +29,10 @@ export type Data = {
 };
 
 export type Day = {
-  "10:00": TimeLog;
-  "13:00": TimeLog;
-  "16:00": TimeLog;
-  "19:00": TimeLog;
-  "22:00": TimeLog;
+  [time: string]: TimeLog;
 };
+export const DURATION_24_HOURS_MS = 86_400_000;
+export const CHECKPOINTS = ["10:00", "13:00", "16:00", "19:00", "22:00"];
 
 const Home: NextPage = () => {
   const audio = useRef<HTMLAudioElement | undefined>(
@@ -55,6 +53,12 @@ const Home: NextPage = () => {
     energy: 0,
   });
   const [data, setData] = useState<Data | null>(null);
+  const [previousDay, setPreviousDay] = useState<Day | undefined | null>(null);
+  const isProblemWithYesterday =
+    previousDay === undefined ||
+    (previousDay !== null &&
+      Object.keys(previousDay).length !== CHECKPOINTS.length);
+  // notifications and initial local storage
   useEffect(() => {
     if (typeof window !== "undefined") {
       const data = localStorage.getItem("data");
@@ -72,13 +76,13 @@ const Home: NextPage = () => {
       }
     }
   }, []);
+  // time check interval for audio and notification
   useEffect(() => {
     const timer = setInterval(() => {
-      const times = ["10:00", "13:00", "16:00", "19:00", "22:00"];
       const currentHour = new Date().getHours();
       const currentMinute = new Date().getMinutes();
       const currentTime = `${currentHour}:${currentMinute}`;
-      if (times.includes(currentTime)) {
+      if (CHECKPOINTS.includes(currentTime)) {
         audio.current?.play().catch((e) => console.error(e));
         new Notification("Time to write about your mood!", {
           body: "If you don't want to, you can always change it later :)",
@@ -87,6 +91,16 @@ const Home: NextPage = () => {
     }, 60000);
     return () => clearInterval(timer);
   }, [audio]);
+  useEffect(() => {
+    if (!data) return;
+    const todayMS = new Date().getTime();
+    const yesterdayDate = new Date(
+      todayMS - DURATION_24_HOURS_MS
+    ).toDateString();
+    const yesterdayData = data[yesterdayDate];
+    setPreviousDay(yesterdayData);
+  }, [data]);
+  // form handling
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     setForm({ ...form, [name]: type === "number" ? +value : value });
@@ -94,13 +108,26 @@ const Home: NextPage = () => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     console.log(form);
     e.preventDefault();
-    const today = new Date().toDateString();
     if (!data) throw new Error("Something went wrong");
-    const todayData = data[today] || {};
+    let prevData, date;
+    if (isProblemWithYesterday) {
+      const todayMS = new Date().getTime();
+      const yesterdayDate = new Date(
+        todayMS - DURATION_24_HOURS_MS
+      ).toDateString();
+      const yesterdayData = data[yesterdayDate];
+      prevData = yesterdayData;
+      date = yesterdayDate;
+    } else {
+      const todayDate = new Date().toDateString();
+      const todayData = data[todayDate];
+      date = todayDate;
+      prevData = todayData;
+    }
     const newData = {
       ...data,
-      [today]: {
-        ...todayData,
+      [date]: {
+        ...prevData,
         [form.time]: {
           mood: form.mood,
           stressors: form.stressors,
@@ -112,11 +139,10 @@ const Home: NextPage = () => {
     localStorage.setItem("data", JSON.stringify(newData));
     setData(newData);
   };
-
   return (
     <>
-      <div className="flex min-h-screen flex-col items-center justify-evenly gap-4">
-        <div className="mt-4 flex h-full w-full gap-2 max-md:flex-col ">
+      <div className="flex min-h-screen flex-col  items-center justify-evenly gap-4 overflow-hidden">
+        <div className="mt-4 flex w-full max-md:flex-col ">
           <DailyAverage data={data} />
           <Days data={data} />
         </div>
@@ -127,6 +153,24 @@ const Home: NextPage = () => {
           <h2 className="text-xl">
             Write these parameters on a ten-point scale
           </h2>
+          {isProblemWithYesterday ? (
+            <>
+              <h2 className="text-xl">
+                Yesterday wasn&apos;t filled fully, please fill it now:
+              </h2>
+              <ul className="list-disc">
+                {CHECKPOINTS.map((time, i) => {
+                  return !previousDay || !previousDay[time] ? (
+                    <li key={i}>{time}</li>
+                  ) : (
+                    ""
+                  );
+                })}
+              </ul>
+            </>
+          ) : (
+            ""
+          )}
           <label className="flex  gap-2">
             Mood:
             <input

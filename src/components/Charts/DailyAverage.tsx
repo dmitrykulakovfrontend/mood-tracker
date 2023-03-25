@@ -56,10 +56,10 @@ const Chart = (props: { data: Data | null }) => {
       )
         throw new Error("Invalid time");
       const averageTime: TimeLog = average[time];
-      averageTime.mood += day[time].mood;
-      averageTime.energy += day[time].energy;
-      averageTime.weather += day[time].weather;
-      averageTime.stressors += day[time].stressors;
+      averageTime.mood += day[time]?.mood || 0;
+      averageTime.energy += day[time]?.energy || 0;
+      averageTime.weather += day[time]?.weather || 0;
+      averageTime.stressors += day[time]?.stressors || 0;
     }
   }
   for (const time in average) {
