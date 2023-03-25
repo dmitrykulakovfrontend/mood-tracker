@@ -12,7 +12,6 @@ import {
   YAxis,
 } from "recharts";
 import { type CategoricalChartState } from "recharts/types/chart/generateCategoricalChart";
-import { date } from "zod";
 import { type Day, type Data } from "~/pages";
 
 type DailyAverage = {
@@ -88,19 +87,16 @@ const DailyChart = ({ data }: { data: Data | null }) => {
   >([]);
   const [isDayView, setDayView] = useState(false);
   return (
-    <>
+    <div className="relative w-1/2 max-md:w-full">
       {isDayView && (
         <button
           className="absolute top-4 left-20 z-10 bg-green-400 py-1 px-2"
-          onClick={(e) => setDayView(false)}
+          onClick={() => setDayView(false)}
         >
           Back
         </button>
       )}
-      <ResponsiveContainer
-        className="relative !w-1/2 max-md:!w-full"
-        height={250}
-      >
+      <ResponsiveContainer height={250}>
         <AreaChart
           data={isDayView ? day : getAverageSymptoms(data)}
           margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
@@ -147,7 +143,7 @@ const DailyChart = ({ data }: { data: Data | null }) => {
           />
         </AreaChart>
       </ResponsiveContainer>
-    </>
+    </div>
   );
 };
 
