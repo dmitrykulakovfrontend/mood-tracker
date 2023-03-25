@@ -12,8 +12,12 @@ import {
 // @ts-ignore
 import sound from "../reminder.mp3";
 
-const AreaChart = dynamic(import("~/components/AreaChart"), { ssr: false });
-const DailyChart = dynamic(import("~/components/DailyChart"), { ssr: false });
+const DailyAverage = dynamic(import("~/components/Charts/DailyAverage"), {
+  ssr: false,
+});
+const Days = dynamic(import("~/components/Charts/Days"), {
+  ssr: false,
+});
 export type TimeLog = {
   mood: number;
   stressors: number;
@@ -88,6 +92,7 @@ const Home: NextPage = () => {
     setForm({ ...form, [name]: type === "number" ? +value : value });
   };
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    console.log(form);
     e.preventDefault();
     const today = new Date().toDateString();
     if (!data) throw new Error("Something went wrong");
@@ -110,10 +115,10 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <div className="flex h-screen w-screen flex-col items-center justify-evenly gap-4">
-        <div className="flex gap-2">
-          <AreaChart data={data} />
-          <DailyChart data={data} />
+      <div className="flex min-h-screen flex-col items-center justify-evenly gap-4">
+        <div className="mt-4 flex h-full w-full gap-2 max-md:flex-col ">
+          <DailyAverage data={data} />
+          <Days data={data} />
         </div>
         <form
           className="flex flex-col items-center justify-center gap-4"
@@ -128,6 +133,7 @@ const Home: NextPage = () => {
               type="number"
               min={1}
               max={10}
+              value={form.mood}
               className="rounded-lg border py-1 px-2 shadow-inner shadow-green-200"
               placeholder="10?"
               name="mood"
@@ -141,6 +147,7 @@ const Home: NextPage = () => {
               type="number"
               min={1}
               max={10}
+              value={form.energy}
               className="rounded-lg border py-1 px-2 shadow-inner shadow-yellow-200"
               placeholder="9?"
               name="energy"
@@ -152,6 +159,7 @@ const Home: NextPage = () => {
             Stressors:
             <input
               type="number"
+              value={form.stressors}
               min={1}
               max={10}
               className="rounded-lg border py-1 px-2 shadow-inner shadow-red-200"
@@ -165,6 +173,7 @@ const Home: NextPage = () => {
             Weather:
             <input
               type="number"
+              value={form.weather}
               min={1}
               max={10}
               className="rounded-lg border py-1 px-2 shadow-inner shadow-blue-200"

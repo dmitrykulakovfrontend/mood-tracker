@@ -6,6 +6,7 @@ import {
   CartesianGrid,
   Label,
   Legend,
+  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -87,7 +88,7 @@ const DailyChart = ({ data }: { data: Data | null }) => {
   >([]);
   const [isDayView, setDayView] = useState(false);
   return (
-    <div className="relative">
+    <>
       {isDayView && (
         <button
           className="absolute top-4 left-20 z-10 bg-green-400 py-1 px-2"
@@ -96,54 +97,57 @@ const DailyChart = ({ data }: { data: Data | null }) => {
           Back
         </button>
       )}
-      <AreaChart
-        width={730}
+      <ResponsiveContainer
+        className="relative !w-1/2 max-md:!w-full"
         height={250}
-        data={isDayView ? day : getAverageSymptoms(data)}
-        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-        onClick={handleClick}
       >
-        <XAxis dataKey="time" />
-        <YAxis />
-        <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip />
-        {isDayView && <Label />}
-        <Legend
-          align="right"
-          layout="vertical"
-          verticalAlign="top"
-          height={36}
-        />
-        <Area
-          type="monotone"
-          dataKey="weather"
-          stroke="#10c3ff"
-          fillOpacity={1}
-          fill="url(#colorUv)"
-        />
-        <Area
-          type="monotone"
-          dataKey="stressors"
-          stroke="#ff1064"
-          fillOpacity={1}
-          fill="url(#colorUv)"
-        />
-        <Area
-          type="monotone"
-          dataKey="energy"
-          stroke="#ffbf00"
-          fillOpacity={1}
-          fill="url(#colorUv)"
-        />
-        <Area
-          type="monotone"
-          dataKey="mood"
-          stroke="#82ca9d"
-          fillOpacity={1}
-          fill="url(#colorPv)"
-        />
-      </AreaChart>
-    </div>
+        <AreaChart
+          data={isDayView ? day : getAverageSymptoms(data)}
+          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          onClick={handleClick}
+        >
+          <XAxis dataKey="time" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          {isDayView && <Label />}
+          <Legend
+            align="right"
+            layout="vertical"
+            verticalAlign="top"
+            height={36}
+          />
+          <Area
+            type="monotone"
+            dataKey="weather"
+            stroke="#10c3ff"
+            fillOpacity={1}
+            fill="url(#colorUv)"
+          />
+          <Area
+            type="monotone"
+            dataKey="stressors"
+            stroke="#ff1064"
+            fillOpacity={1}
+            fill="url(#colorUv)"
+          />
+          <Area
+            type="monotone"
+            dataKey="energy"
+            stroke="#ffbf00"
+            fillOpacity={1}
+            fill="url(#colorUv)"
+          />
+          <Area
+            type="monotone"
+            dataKey="mood"
+            stroke="#82ca9d"
+            fillOpacity={1}
+            fill="url(#colorPv)"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </>
   );
 };
 

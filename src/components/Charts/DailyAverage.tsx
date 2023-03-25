@@ -3,12 +3,13 @@ import {
   AreaChart,
   CartesianGrid,
   Legend,
+  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 import { type Data } from "~/pages";
-import { type TimeLog } from "../pages/index";
+import { type TimeLog } from "../../pages/index";
 
 const Chart = (props: { data: Data | null }) => {
   // const example = {
@@ -91,51 +92,51 @@ const Chart = (props: { data: Data | null }) => {
 
   return (
     <>
-      <AreaChart
-        width={730}
-        height={250}
-        data={result}
-        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-      >
-        <XAxis dataKey="time" />
-        <YAxis />
-        <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip />
-        <Legend
-          align="right"
-          layout="vertical"
-          verticalAlign="top"
-          height={36}
-        />
-        <Area
-          type="monotone"
-          dataKey="weather"
-          stroke="#10c3ff"
-          fillOpacity={1}
-          fill="url(#colorUv)"
-        />
-        <Area
-          type="monotone"
-          dataKey="stressors"
-          stroke="#ff1064"
-          fillOpacity={1}
-          fill="url(#colorUv)"
-        />
-        <Area
-          type="monotone"
-          dataKey="energy"
-          stroke="#ffbf00"
-          fillOpacity={1}
-          fill="url(#colorUv)"
-        />
-        <Area
-          type="monotone"
-          dataKey="mood"
-          stroke="#82ca9d"
-          fillOpacity={1}
-          fill="url(#colorPv)"
-        />
-      </AreaChart>
+      <ResponsiveContainer className="!w-1/2 max-md:!w-full" height={250}>
+        <AreaChart
+          data={result}
+          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+        >
+          <XAxis dataKey="time" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend
+            align="right"
+            layout="vertical"
+            verticalAlign="top"
+            height={36}
+          />
+          <Area
+            type="monotone"
+            dataKey="weather"
+            stroke="#10c3ff"
+            fillOpacity={1}
+            fill="url(#colorUv)"
+          />
+          <Area
+            type="monotone"
+            dataKey="stressors"
+            stroke="#ff1064"
+            fillOpacity={1}
+            fill="url(#colorUv)"
+          />
+          <Area
+            type="monotone"
+            dataKey="energy"
+            stroke="#ffbf00"
+            fillOpacity={1}
+            fill="url(#colorUv)"
+          />
+          <Area
+            type="monotone"
+            dataKey="mood"
+            stroke="#82ca9d"
+            fillOpacity={1}
+            fill="url(#colorPv)"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
     </>
   );
 };
