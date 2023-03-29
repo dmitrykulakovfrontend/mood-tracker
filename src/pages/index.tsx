@@ -7,10 +7,6 @@ import {
   useEffect,
   useRef,
 } from "react";
-// import DailyChart from "~/components/DailyChart";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import sound from "../reminder.mp3";
 
 const DailyAverage = dynamic(import("~/components/Charts/DailyAverage"), {
   ssr: false,
@@ -36,9 +32,22 @@ export const CHECKPOINTS = ["10:00", "13:00", "16:00", "19:00", "22:00"];
 
 const Home: NextPage = () => {
   const audio = useRef<HTMLAudioElement | undefined>(
-    typeof Audio !== "undefined" ? new Audio(sound as string) : undefined
+    typeof Audio !== "undefined"
+      ? new Audio(
+          "https://assets.mixkit.co/active_storage/sfx/937/937-preview.mp3"
+        )
+      : undefined
   );
 
+  function playNotification() {
+    if (audio.current?.volume) {
+      audio.current.volume = 0.05;
+    }
+    audio.current?.play().catch((e) => console.error(e));
+    new Notification("Time to write about your mood!", {
+      body: "If you don't want to, you can always change it later :)",
+    });
+  }
   const [form, setForm] = useState<{
     time: string;
     mood: number;
@@ -58,7 +67,7 @@ const Home: NextPage = () => {
     previousDay === undefined ||
     (previousDay !== null &&
       Object.keys(previousDay).length !== CHECKPOINTS.length);
-  // notifications and initial local storage
+  // Notifications and initial local storage
   useEffect(() => {
     if (typeof window !== "undefined") {
       const data = localStorage.getItem("data");
@@ -76,21 +85,19 @@ const Home: NextPage = () => {
       }
     }
   }, []);
-  // time check interval for audio and notification
+  // Time check interval for audio and notification
   useEffect(() => {
     const timer = setInterval(() => {
       const currentHour = new Date().getHours();
       const currentMinute = new Date().getMinutes();
       const currentTime = `${currentHour}:${currentMinute}`;
       if (CHECKPOINTS.includes(currentTime)) {
-        audio.current?.play().catch((e) => console.error(e));
-        new Notification("Time to write about your mood!", {
-          body: "If you don't want to, you can always change it later :)",
-        });
+        playNotification();
       }
     }, 60000);
     return () => clearInterval(timer);
   }, [audio]);
+
   useEffect(() => {
     if (!data) return;
     const todayMS = new Date().getTime();
@@ -141,7 +148,7 @@ const Home: NextPage = () => {
   };
   return (
     <>
-      <div className="flex min-h-screen flex-col  items-center justify-evenly gap-4 overflow-hidden">
+      <div className="relative flex min-h-screen flex-col  items-center justify-evenly gap-4 overflow-hidden">
         <div className="mt-4 flex w-full max-md:flex-col ">
           <DailyAverage data={data} />
           <Days data={data} />
@@ -292,6 +299,12 @@ const Home: NextPage = () => {
             Submit
           </button>
         </form>
+        <button
+          onClick={() => playNotification()}
+          className="fixed bottom-4 left-4 rounded-lg border bg-green-400 py-1 px-2 font-sans text-white"
+        >
+          Test notifications
+        </button>
       </div>
     </>
   );
